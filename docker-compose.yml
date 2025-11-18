@@ -1,0 +1,189 @@
+version: '3.8'
+
+services:
+  # MongoDB for local development
+  mongodb:
+    image: mongo:7.0
+    container_name: bharat-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: bharat_oil
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - bharat-network
+
+  # Redis for caching and rate limiting
+  redis:
+    image: redis:7-alpine
+    container_name: bharat-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - bharat-network
+
+  # MQTT Broker for IoT (Eclipse Mosquitto)
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: bharat-mqtt
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./infra/mosquitto/config:/mosquitto/config
+      - ./infra/mosquitto/data:/mosquitto/data
+      - ./infra/mosquitto/log:/mosquitto/log
+    networks:
+      - bharat-network
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    container_name: bharat-api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/bharat_oil?authSource=admin
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - mongodb
+      - redis
+    volumes:
+      - ./services/api-gateway:/app
+      - /app/node_modules
+    networks:
+      - bharat-network
+    command: npm run dev
+
+  # Auth Service
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    container_name: bharat-auth-service
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - mongodb
+    volumes:
+      - ./services/auth-service:/app
+      - /app/node_modules
+    networks:
+      - bharat-network
+    command: npm run dev
+
+  # User Service
+  user-service:
+    build:
+      context: ./services/user-service
+      dockerfile: Dockerfile
+    container_name: bharat-user-service
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/bharat_oil?authSource=admin
+    depends_on:
+      - mongodb
+    volumes:
+      - ./services/user-service:/app
+      - /app/node_modules
+    networks:
+      - bharat-network
+    command: npm run dev
+
+  # Tracking Service
+  tracking-service:
+    build:
+      context: ./services/tracking-service
+      dockerfile: Dockerfile
+    container_name: bharat-tracking-service
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/bharat_oil?authSource=admin
+      - MQTT_BROKER_URL=mqtt://mosquitto:1883
+    depends_on:
+      - mongodb
+      - mosquitto
+    volumes:
+      - ./services/tracking-service:/app
+      - /app/node_modules
+    networks:
+      - bharat-network
+    command: npm run dev
+
+  # AI Service (Python)
+  ai-service:
+    build:
+      context: ./services/ai-service
+      dockerfile: Dockerfile
+    container_name: bharat-ai-service
+    ports:
+      - "3004:3004"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/bharat_oil?authSource=admin
+    depends_on:
+      - mongodb
+    volumes:
+      - ./services/ai-service:/app
+    networks:
+      - bharat-network
+    command: uvicorn main:app --host 0.0.0.0 --port 3004 --reload
+
+  # Reward Service
+  reward-service:
+    build:
+      context: ./services/reward-service
+      dockerfile: Dockerfile
+    container_name: bharat-reward-service
+    ports:
+      - "3005:3005"
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://admin:password123@mongodb:27017/bharat_oil?authSource=admin
+    depends_on:
+      - mongodb
+    volumes:
+      - ./services/reward-service:/app
+      - /app/node_modules
+    networks:
+      - bharat-network
+    command: npm run dev
+
+  # IoT Simulator
+  iot-simulator:
+    build:
+      context: ./iot/simulator
+      dockerfile: Dockerfile
+    container_name: bharat-iot-simulator
+    environment:
+      - MQTT_BROKER_URL=mqtt://mosquitto:1883
+    depends_on:
+      - mosquitto
+    volumes:
+      - ./iot/simulator:/app
+      - /app/node_modules
+    networks:
+      - bharat-network
+    command: npm start
+
+volumes:
+  mongodb_data:
+  redis_data:
+
+networks:
+  bharat-network:
+    driver: bridge

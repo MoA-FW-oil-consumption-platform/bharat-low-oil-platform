@@ -1,0 +1,42 @@
+{
+  "name": "bharat-low-oil-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Government platform for reducing edible oil consumption in India",
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean && rm -rf node_modules",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "mobile": "cd apps/mobile-app && npm start",
+    "admin": "cd apps/admin-dashboard && npm run dev",
+    "restaurant": "cd apps/restaurant-portal && npm run dev",
+    "gateway": "cd services/api-gateway && npm run dev",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "setup": "node scripts/setup.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "prettier": "^3.1.0",
+    "turbo": "^1.11.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MoA-FW-oil-consumption-platform/bharat-low-oil-platform.git"
+  },
+  "author": "Ministry of Agriculture & Farmers Welfare",
+  "license": "MIT"
+}
