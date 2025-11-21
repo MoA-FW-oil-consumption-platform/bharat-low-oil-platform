@@ -4,14 +4,15 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import { connectDB } from './config/database';
-import userRoutes from './routes/user.routes';
-import institutionRoutes from './routes/institution.routes';
+import moduleRoutes from './routes/module.routes';
+import progressRoutes from './routes/progress.routes';
+import certificateRoutes from './routes/certificate.routes';
 import { errorHandler } from './middleware/errorHandler';
 
 dotenv.config();
 
 const app: Application = express();
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3007;
 
 // Connect to MongoDB
 connectDB();
@@ -23,17 +24,18 @@ app.use(express.json());
 
 // Routes
 app.get('/health', (_req, res) => {
-  res.json({ status: 'healthy', service: 'user-service' });
+  res.json({ status: 'healthy', service: 'learning-service' });
 });
 
-app.use('/users', userRoutes);
-app.use('/api/institutions', institutionRoutes);
+app.use('/modules', moduleRoutes);
+app.use('/progress', progressRoutes);
+app.use('/certificates', certificateRoutes);
 
 // Error handling
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`👤 User Service running on port ${PORT}`);
+  console.log(`🎓 Learning Service running on port ${PORT}`);
 });
 
 export default app;

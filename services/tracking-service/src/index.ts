@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import { connectDB } from './config/database';
 import trackingRoutes from './routes/tracking.routes';
+import institutionalRoutes from './routes/institutional.routes';
 import { errorHandler } from './middleware/errorHandler';
 import { initMQTT } from './services/mqtt.service';
 
@@ -32,6 +33,7 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/tracking', trackingRoutes);
+app.use('/institutional', institutionalRoutes);
 
 // Error handling
 app.use(errorHandler);
