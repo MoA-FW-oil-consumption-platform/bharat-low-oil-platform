@@ -9,7 +9,7 @@ export interface User {
   familySize?: number;
   dietaryPreferences?: string[];
   healthGoals?: string[];
-  preferredLanguage: 'en' | 'hi' | 'ta';
+  preferredLanguage: 'en' | 'hi' | 'ta' | 'bn' | 'te';
   location?: Location;
   createdAt: Date;
   updatedAt: Date;
@@ -97,9 +97,13 @@ export interface Recipe {
   name: string;
   nameHindi?: string;
   nameTamil?: string;
+  nameBengali?: string;
+  nameTelugu?: string;
   description: string;
   descriptionHindi?: string;
   descriptionTamil?: string;
+  descriptionBengali?: string;
+  descriptionTelugu?: string;
   oilAmount: number; // in ml
   cuisine: string;
   difficulty: 'easy' | 'medium' | 'hard';
@@ -200,9 +204,13 @@ export interface Campaign {
   title: string;
   titleHindi?: string;
   titleTamil?: string;
+  titleBengali?: string;
+  titleTelugu?: string;
   description: string;
   descriptionHindi?: string;
   descriptionTamil?: string;
+  descriptionBengali?: string;
+  descriptionTelugu?: string;
   type: 'challenge' | 'awareness' | 'competition' | 'education';
   targetReduction: number; // percentage
   rewardPoints: number;

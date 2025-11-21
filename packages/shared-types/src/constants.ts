@@ -24,7 +24,7 @@ export const CONSUMPTION_TYPES = [
   'other',
 ] as const;
 
-export const LANGUAGES = ['en', 'hi', 'ta'] as const;
+export const LANGUAGES = ['en', 'hi', 'ta', 'bn', 'te'] as const;
 
 export const DIFFICULTY_LEVELS = ['easy', 'medium', 'hard'] as const;
 
