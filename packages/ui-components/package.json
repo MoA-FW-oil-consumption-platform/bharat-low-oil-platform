@@ -1,0 +1,28 @@
+{
+  "name": "@bharat-low-oil/ui-components",
+  "version": "1.0.0",
+  "description": "Shared React UI components",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bharat-low-oil/shared-types": "*",
+    "@bharat-low-oil/utils": "*",
+    "react": "^18.2.0",
+    "react-native": "^0.73.11"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-native": "^0.73.0",
+    "typescript": "^5.3.3"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0"
+  }
+}
