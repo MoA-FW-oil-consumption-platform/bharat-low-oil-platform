@@ -9,19 +9,21 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "turbo run dev --concurrency=15",
+    "dev": "turbo run dev --parallel",
+    "dev:apps": "turbo run dev --filter='./apps/*' --parallel",
+    "dev:services": "turbo run dev --filter='./services/*' --parallel",
+    "dev:web": "turbo run dev --filter='./apps/web-app' --filter='./apps/admin-dashboard' --filter='./apps/restaurant-portal' --parallel",
+    "dev:mobile": "turbo run dev --filter='./apps/mobile-app'",
     "build": "turbo run build",
-    "test": "turbo run test",
+    "build:apps": "turbo run build --filter='./apps/*'",
+    "build:services": "turbo run build --filter='./services/*'",
+    "build:packages": "turbo run build --filter='./packages/*'",
     "lint": "turbo run lint",
+    "test": "turbo run test",
     "clean": "turbo run clean && rm -rf node_modules",
-    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
-    "mobile": "cd apps/mobile-app && npm start",
-    "admin": "cd apps/admin-dashboard && npm run dev",
-    "restaurant": "cd apps/restaurant-portal && npm run dev",
-    "gateway": "cd services/api-gateway && npm run dev",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
-    "setup": "node scripts/setup.js"
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
