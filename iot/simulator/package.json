@@ -1,0 +1,21 @@
+{
+  "name": "@bharat-low-oil/iot-simulator",
+  "version": "1.0.0",
+  "description": "MQTT-based IoT weight sensor simulator for oil bottle tracking",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "simulate:single": "node src/simulators/singleDevice.js",
+    "simulate:multi": "node src/simulators/multiDevice.js",
+    "test": "echo \"No tests yet\""
+  },
+  "dependencies": {
+    "mqtt": "^5.3.4",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
