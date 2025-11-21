@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: 142 76% 36%;
+  --primary-foreground: 355.7 100% 97.3%;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+}
