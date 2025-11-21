@@ -1,0 +1,445 @@
+openapi: 3.0.3
+info:
+  title: BLOC Partnership API
+  description: |
+    External partner API for restaurant integrations with the Bharat Low-Oil Campaign platform.
+    
+    **Authentication:** API Key-based authentication with JWT token exchange.
+    
+    **Rate Limiting:** 100 requests per 15 minutes per API key.
+    
+    **Base URL:** `https://api.bloc.gov.in/partner` (Production)
+    
+    **Test URL:** `http://localhost:3006/api/partner` (Development)
+  version: 1.0.0
+  contact:
+    name: BLOC API Support
+    email: api-support@bloc.gov.in
+  license:
+    name: Government of India
+    url: https://bloc.gov.in/license
+
+servers:
+  - url: https://api.bloc.gov.in/partner
+    description: Production server
+  - url: http://localhost:3006/api/partner
+    description: Development server
+
+tags:
+  - name: Authentication
+    description: Partner registration and authentication
+  - name: Menu Management
+    description: Menu upload and low-oil certification
+  - name: Certification
+    description: Blockchain certification verification
+  - name: Webhooks
+    description: Webhook subscription and management
+
+paths:
+  /register:
+    post:
+      tags:
+        - Authentication
+      summary: Register as a partner
+      description: Register your restaurant to get an API key for accessing the BLOC platform
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - restaurantId
+                - restaurantName
+              properties:
+                restaurantId:
+                  type: string
+                  description: Your unique restaurant identifier
+                  example: "rest_12345"
+                restaurantName:
+                  type: string
+                  description: Restaurant name
+                  example: "Healthy Bites Restaurant"
+                email:
+                  type: string
+                  format: email
+                  description: Contact email
+                  example: "owner@healthybites.com"
+                phone:
+                  type: string
+                  description: Contact phone number
+                  example: "+91-9876543210"
+                permissions:
+                  type: array
+                  items:
+                    type: string
+                    enum: [menu:read, menu:write, cert:read, orders:read, webhook:manage]
+                  description: Requested permissions
+                  example: ["menu:read", "menu:write", "cert:read"]
+      responses:
+        '201':
+          description: Partner registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Partner registered successfully"
+                  partner:
+                    type: object
+                    properties:
+                      partnerId:
+                        type: string
+                        example: "partner_a1b2c3d4e5f6g7h8"
+                      restaurantId:
+                        type: string
+                        example: "rest_12345"
+                      restaurantName:
+                        type: string
+                        example: "Healthy Bites Restaurant"
+                      apiKey:
+                        type: string
+                        example: "bloc_1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p"
+                      permissions:
+                        type: array
+                        items:
+                          type: string
+                        example: ["menu:read", "menu:write", "cert:read"]
+                      rateLimit:
+                        type: number
+                        example: 100
+                  warning:
+                    type: string
+                    example: "Store this API key securely. It will not be shown again."
+        '409':
+          description: Partner already registered
+        '400':
+          description: Invalid request
+
+  /auth/token:
+    post:
+      tags:
+        - Authentication
+      summary: Get JWT token
+      description: Exchange your API key for a JWT token (valid for 24 hours)
+      parameters:
+        - name: X-API-Key
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Your BLOC API key
+          example: "bloc_1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p"
+      responses:
+        '200':
+          description: JWT token generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  expiresIn:
+                    type: string
+                    example: "24h"
+                  partner:
+                    type: object
+                    properties:
+                      partnerId:
+                        type: string
+                      restaurantId:
+                        type: string
+                      permissions:
+                        type: array
+                        items:
+                          type: string
+        '401':
+          description: Invalid API key
+        '429':
+          description: Rate limit exceeded
+
+  /menu/upload:
+    post:
+      tags:
+        - Menu Management
+      summary: Upload menu items
+      description: Upload your menu items for low-oil certification
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - items
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - name
+                      - oilAmount
+                    properties:
+                      name:
+                        type: string
+                        description: Dish name
+                        example: "Grilled Paneer Tikka"
+                      oilAmount:
+                        type: number
+                        description: Oil used per serving in ml
+                        example: 12
+                      category:
+                        type: string
+                        description: Dish category
+                        example: "Appetizers"
+                      price:
+                        type: number
+                        description: Price in INR
+                        example: 280
+                      description:
+                        type: string
+                        description: Dish description
+      responses:
+        '200':
+          description: Menu uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  restaurantId:
+                    type: string
+                  summary:
+                    type: object
+                    properties:
+                      totalItems:
+                        type: number
+                      lowOilCertified:
+                        type: number
+                      certificationRate:
+                        type: number
+                      uploadedAt:
+                        type: string
+                        format: date-time
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        oilAmount:
+                          type: number
+                        lowOilCertified:
+                          type: boolean
+                        certificationBadge:
+                          type: string
+                          example: "🟢 BLOC Low-Oil Certified"
+        '401':
+          description: Unauthorized
+        '403':
+          description: Insufficient permissions
+
+  /certification/check:
+    post:
+      tags:
+        - Certification
+      summary: Check certification status
+      description: Query blockchain for restaurant certification status
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - restaurantId
+              properties:
+                restaurantId:
+                  type: string
+                  example: "rest_12345"
+      responses:
+        '200':
+          description: Certification retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  certification:
+                    type: object
+                    properties:
+                      restaurantId:
+                        type: string
+                      certificateId:
+                        type: string
+                      level:
+                        type: string
+                        enum: [Bronze, Silver, Gold, Platinum]
+                        example: "Gold"
+                      score:
+                        type: number
+                        example: 85
+                      issueDate:
+                        type: string
+                        format: date-time
+                      expiryDate:
+                        type: string
+                        format: date-time
+                      verificationUrl:
+                        type: string
+                      status:
+                        type: string
+                        enum: [active, expired, revoked]
+                      criteria:
+                        type: object
+                        properties:
+                          lowOilMenuPercentage:
+                            type: number
+                          customerSatisfaction:
+                            type: number
+                          complianceScore:
+                            type: number
+
+  /webhook/subscribe:
+    post:
+      tags:
+        - Webhooks
+      summary: Subscribe to webhooks
+      description: Register a webhook URL to receive real-time notifications
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - webhookUrl
+                - events
+              properties:
+                webhookUrl:
+                  type: string
+                  format: uri
+                  description: Your webhook endpoint URL
+                  example: "https://restaurant.com/bloc-webhook"
+                events:
+                  type: array
+                  items:
+                    type: string
+                    enum: [certification_updated, compliance_alert, menu_sync, order_placed]
+                  description: Events to subscribe to
+                  example: ["certification_updated", "compliance_alert"]
+      responses:
+        '200':
+          description: Webhook subscribed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  webhook:
+                    type: object
+                    properties:
+                      partnerId:
+                        type: string
+                      restaurantId:
+                        type: string
+                      webhookUrl:
+                        type: string
+                      events:
+                        type: array
+                        items:
+                          type: string
+                      secret:
+                        type: string
+                        description: Use this secret to verify webhook signatures (HMAC-SHA256)
+                      subscribedAt:
+                        type: string
+                        format: date-time
+                      isActive:
+                        type: boolean
+
+  /stats:
+    get:
+      tags:
+        - Authentication
+      summary: Get partner usage statistics
+      description: Retrieve your API usage statistics
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  partnerId:
+                    type: string
+                  restaurantId:
+                    type: string
+                  stats:
+                    type: object
+                    properties:
+                      totalRequests:
+                        type: number
+                      lastUsedAt:
+                        type: string
+                        format: date-time
+                      rateLimit:
+                        type: number
+                      permissions:
+                        type: array
+                        items:
+                          type: string
+                      accountAge:
+                        type: number
+                        description: Days since registration
+                      status:
+                        type: string
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key provided during registration
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from /auth/token endpoint
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+        details:
+          type: string
+          description: Additional error details
+
+security:
+  - ApiKeyAuth: []
+  - BearerAuth: []
