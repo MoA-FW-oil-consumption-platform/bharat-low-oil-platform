@@ -23,6 +23,7 @@ interface OilLog {
 
 export default function TrackPage() {
   const { user, token } = useAuthStore()
+  const { toast } = useToast()
   const [logs, setLogs] = useState<OilLog[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -55,10 +56,40 @@ export default function TrackPage() {
 
   const handleManualSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!user?.userId) return
+    console.log("Submitting log...", { amount, oilType, date, notes, userId: user?.userId })
+    
+    if (!user?.userId) {
+      console.error("No user ID found")
+      toast({
+        title: "Error",
+        description: "User session not found. Please login again.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!amount || Number(amount) <= 0) {
+      console.error("Invalid amount")
+      toast({
+        title: "Invalid Amount",
+        description: "Please enter a valid oil amount greater than 0.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!date) {
+      toast({
+        title: "Invalid Date",
+        description: "Please select a date.",
+        variant: "destructive",
+      })
+      return
+    }
 
     setIsSubmitting(true)
     try {
+      console.log("Sending request to API...")
       await apiClient.post(
         '/tracking/logs',
         {
@@ -70,13 +101,24 @@ export default function TrackPage() {
           notes
         }
       )
+      console.log("Log created successfully")
       
+      toast({
+        title: "Success",
+        description: "Oil consumption logged successfully!",
+      })
+
       // Reset form and refresh logs
       setAmount("")
       setNotes("")
       fetchLogs()
     } catch (error) {
       console.error("Failed to create log", error)
+      toast({
+        title: "Error",
+        description: "Failed to save log. Please try again.",
+        variant: "destructive",
+      })
     } finally {
       setIsSubmitting(false)
     }
@@ -154,7 +196,6 @@ export default function TrackPage() {
                     <Input 
                       id="date" 
                       type="date" 
-                      required
                       value={date}
                       onChange={(e) => setDate(e.target.value)}
                     />
@@ -185,7 +226,6 @@ export default function TrackPage() {
                       type="number" 
                       placeholder="e.g. 15" 
                       min="0"
-                      required
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
                     />

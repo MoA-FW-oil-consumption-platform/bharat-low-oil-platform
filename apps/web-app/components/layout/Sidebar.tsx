@@ -16,7 +16,8 @@ import {
   School, 
   LogOut,
   Menu,
-  X
+  X,
+  BookOpen
 } from "lucide-react"
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
@@ -62,6 +63,12 @@ export function Sidebar({ className }: SidebarProps) {
       icon: School,
       href: "/school-monitor",
       color: "text-green-700",
+    },
+    {
+      label: "Learning",
+      icon: BookOpen,
+      href: "/learning",
+      color: "text-blue-500",
     },
   ]
 

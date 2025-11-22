@@ -27,9 +27,9 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'healthy', service: 'learning-service' });
 });
 
-app.use('/modules', moduleRoutes);
-app.use('/progress', progressRoutes);
-app.use('/certificates', certificateRoutes);
+app.use('/learning/modules', moduleRoutes);
+app.use('/learning/progress', progressRoutes);
+app.use('/learning/certificates', certificateRoutes);
 
 // Error handling
 app.use(errorHandler);

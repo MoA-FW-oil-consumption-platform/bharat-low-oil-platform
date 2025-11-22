@@ -10,7 +10,7 @@
     "iot/*"
   ],
   "scripts": {
-    "dev": "turbo run dev --parallel",
+    "dev": "turbo run dev --parallel --concurrency=20",
     "dev:apps": "turbo run dev --filter='./apps/*' --parallel",
     "dev:services": "turbo run dev --filter='./services/*' --parallel",
     "dev:web": "turbo run dev --filter='./apps/web-app' --filter='./apps/admin-dashboard' --filter='./apps/restaurant-portal' --parallel",

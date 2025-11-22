@@ -32,9 +32,9 @@ app.get('/health', (req, res) => {
 });
 
 // Routes
-app.use('/api/integrations', deliveryRoutes);
-app.use('/api/partner', partnerRoutes);
-app.use('/api/certifications', certificationRoutes);
+app.use('/partnerships/api/integrations', deliveryRoutes);
+app.use('/partnerships/api/partner', partnerRoutes);
+app.use('/partnerships/api/certifications', certificationRoutes);
 
 // 404 handler
 app.use((req, res) => {

@@ -61,10 +61,10 @@ async def health_check():
     }
 
 # Include routers
-app.include_router(predictions.router, prefix="/predictions", tags=["Predictions"])
-app.include_router(recommendations.router, prefix="/recommendations", tags=["Recommendations"])
-app.include_router(insights.router, prefix="/insights", tags=["Insights"])
-app.include_router(recognition.router, prefix="/recognition", tags=["Recognition"])
+app.include_router(predictions.router, prefix="/ai/predictions", tags=["Predictions"])
+app.include_router(recommendations.router, prefix="/ai/recommendations", tags=["Recommendations"])
+app.include_router(insights.router, prefix="/ai/insights", tags=["Insights"])
+app.include_router(recognition.router, prefix="/ai/recognition", tags=["Recognition"])
 
 # Global exception handler
 @app.exception_handler(Exception)

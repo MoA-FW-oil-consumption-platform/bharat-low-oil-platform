@@ -84,9 +84,17 @@ class InsightResponse(BaseModel):
 class TrainingRequest(BaseModel):
     model_type: str = Field(..., pattern="^(consumption|recommendation)$")
     force_retrain: bool = False
+    
+    model_config = {
+        "protected_namespaces": ()
+    }
 
 class TrainingResponse(BaseModel):
     model_type: str
     status: str
     metrics: Dict[str, float]
     trained_at: datetime
+    
+    model_config = {
+        "protected_namespaces": ()
+    }

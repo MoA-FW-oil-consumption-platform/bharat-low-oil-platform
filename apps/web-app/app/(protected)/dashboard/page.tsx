@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Link from "next/link"
 import { 
   TrendingDown, 
   Droplet, 
@@ -10,7 +11,8 @@ import {
   Utensils, 
   ScanLine,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  BookOpen
 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -21,7 +23,7 @@ import { useAuthStore } from "@/store/useAuthStore"
 export default function DashboardPage() {
   const { user } = useAuthStore()
   const [oilLevel, setOilLevel] = useState(0)
-  const [rewards, setRewards] = useState({ points: 0, streak: 0, badges: [] })
+  const [rewards, setRewards] = useState<{ points: number; streak: number; badges: any[]; todayPoints: number }>({ points: 0, streak: 0, badges: [], todayPoints: 0 })
   const [monthlyAvg, setMonthlyAvg] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const maxOil = 30 // ICMR recommended daily limit in ml
@@ -45,20 +47,37 @@ export default function DashboardPage() {
 
         // Fetch rewards (points, streak)
         try {
-          const rewardsResponse = await apiClient.get<{ points: number, streak: number, badges: any[] }>(
+          const rewardsResponse = await apiClient.get<{ reward: { totalPoints: number, currentStreak: number, badges: any[], pointsHistory: any[] } }>(
             `/rewards/${user.userId}`
           );
-          setRewards(rewardsResponse);
+          if (rewardsResponse.reward) {
+            const todayStart = new Date();
+            todayStart.setHours(0, 0, 0, 0);
+            
+            const todayPoints = rewardsResponse.reward.pointsHistory
+              ?.filter((h: any) => new Date(h.date) >= todayStart)
+              .reduce((sum: number, h: any) => sum + h.points, 0) || 0;
+
+            setRewards({
+              points: rewardsResponse.reward.totalPoints || 0,
+              streak: rewardsResponse.reward.currentStreak || 0,
+              badges: rewardsResponse.reward.badges || [],
+              todayPoints
+            });
+          }
         } catch (e) {
           console.error("Failed to fetch rewards", e);
         }
 
         // Fetch monthly average
         try {
-          const monthlyResponse = await apiClient.get<{ average: number }>(
+          const monthlyResponse = await apiClient.get<{ totalUsage: number }>(
             `/tracking/usage/${user.userId}/monthly`
           );
-          setMonthlyAvg(monthlyResponse.average);
+          // Calculate daily average based on days passed in current month
+          const daysInMonth = new Date().getDate();
+          const avg = monthlyResponse.totalUsage ? Math.round(monthlyResponse.totalUsage / daysInMonth) : 0;
+          setMonthlyAvg(avg);
         } catch (e) {
           console.error("Failed to fetch monthly stats", e);
         }
@@ -83,9 +102,11 @@ export default function DashboardPage() {
           </p>
         </div>
         <div className="flex items-center space-x-2">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" /> Log Meal
-          </Button>
+          <Link href="/track">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" /> Log Meal
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -136,7 +157,7 @@ export default function DashboardPage() {
                 <p className="text-sm font-medium leading-none">Reward Points</p>
                 <p className="text-sm text-muted-foreground">{rewards.points} pts</p>
               </div>
-              <div className="ml-auto font-medium text-primary">+50 today</div>
+              <div className="ml-auto font-medium text-primary">+{rewards.todayPoints} today</div>
             </div>
             <div className="flex items-center">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-green-500/10">
@@ -165,50 +186,75 @@ export default function DashboardPage() {
 
       {/* Quick Actions Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="hover:bg-secondary/50 transition-colors cursor-pointer">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Scan Food</CardTitle>
-            <ScanLine className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xs text-muted-foreground">
-              Analyze oil content in real-time
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="hover:bg-secondary/50 transition-colors cursor-pointer">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Find Recipes</CardTitle>
-            <Utensils className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xs text-muted-foreground">
-              Discover low-oil alternatives
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="hover:bg-secondary/50 transition-colors cursor-pointer">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Community</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xs text-muted-foreground">
-              Join challenges & leaderboards
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="hover:bg-secondary/50 transition-colors cursor-pointer">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Rewards</CardTitle>
-            <Award className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xs text-muted-foreground">
-              Redeem points for discounts
-            </div>
-          </CardContent>
-        </Card>
+        <Link href="/track">
+          <Card className="hover:bg-secondary/50 transition-colors cursor-pointer h-full">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Scan Food</CardTitle>
+              <ScanLine className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-xs text-muted-foreground">
+                Analyze oil content in real-time
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+        
+        <Link href="/dining">
+          <Card className="hover:bg-secondary/50 transition-colors cursor-pointer h-full">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Find Recipes</CardTitle>
+              <Utensils className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-xs text-muted-foreground">
+                Discover low-oil alternatives
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/community">
+          <Card className="hover:bg-secondary/50 transition-colors cursor-pointer h-full">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Community</CardTitle>
+              <Target className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-xs text-muted-foreground">
+                Join challenges & leaderboards
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/rewards">
+          <Card className="hover:bg-secondary/50 transition-colors cursor-pointer h-full">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Rewards</CardTitle>
+              <Award className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-xs text-muted-foreground">
+                Redeem points for discounts
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/learning">
+          <Card className="hover:bg-secondary/50 transition-colors cursor-pointer h-full">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Learning</CardTitle>
+              <BookOpen className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-xs text-muted-foreground">
+                Educational resources & guides
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
     </div>
   )

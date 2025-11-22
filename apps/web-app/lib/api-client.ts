@@ -6,7 +6,7 @@ interface RequestOptions extends RequestInit {
   token?: string;
 }
 
-const getAuthHeader = (token?: string) => {
+const getAuthHeader = (token?: string): Record<string, string> => {
   const storeToken = useAuthStore.getState().token;
   const finalToken = token || storeToken;
   return finalToken ? { Authorization: `Bearer ${finalToken}` } : {};
@@ -14,15 +14,16 @@ const getAuthHeader = (token?: string) => {
 
 export const apiClient = {
   async get<T>(endpoint: string, options?: RequestOptions): Promise<T> {
-    const headers = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...getAuthHeader(options?.token),
-      ...options?.headers,
+      ...(options?.headers as Record<string, string>),
     };
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'GET',
       headers,
+      cache: 'no-store',
       ...options,
     });
 
@@ -35,13 +36,13 @@ export const apiClient = {
 
   async post<T>(endpoint: string, data?: any, options?: RequestOptions): Promise<T> {
     const isFormData = data instanceof FormData;
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       ...getAuthHeader(options?.token),
-      ...options?.headers,
+      ...(options?.headers as Record<string, string>),
     };
 
     if (!isFormData) {
-      (headers as any)['Content-Type'] = 'application/json';
+      headers['Content-Type'] = 'application/json';
     }
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -60,13 +61,13 @@ export const apiClient = {
 
   async put<T>(endpoint: string, data?: any, options?: RequestOptions): Promise<T> {
     const isFormData = data instanceof FormData;
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       ...getAuthHeader(options?.token),
-      ...options?.headers,
+      ...(options?.headers as Record<string, string>),
     };
 
     if (!isFormData) {
-      (headers as any)['Content-Type'] = 'application/json';
+      headers['Content-Type'] = 'application/json';
     }
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -84,10 +85,10 @@ export const apiClient = {
   },
 
   async delete<T>(endpoint: string, options?: RequestOptions): Promise<T> {
-    const headers = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...getAuthHeader(options?.token),
-      ...options?.headers,
+      ...(options?.headers as Record<string, string>),
     };
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
