@@ -11,7 +11,7 @@ import uvicorn
 import os
 from dotenv import load_dotenv
 
-from app.routers import predictions, recommendations, insights
+from app.routers import predictions, recommendations, insights, recognition
 from app.database import connect_db, close_db
 from app.models.ml_models import MLModels
 
@@ -64,6 +64,7 @@ async def health_check():
 app.include_router(predictions.router, prefix="/predictions", tags=["Predictions"])
 app.include_router(recommendations.router, prefix="/recommendations", tags=["Recommendations"])
 app.include_router(insights.router, prefix="/insights", tags=["Insights"])
+app.include_router(recognition.router, prefix="/recognition", tags=["Recognition"])
 
 # Global exception handler
 @app.exception_handler(Exception)

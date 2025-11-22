@@ -58,7 +58,7 @@ const services = [
   },
   {
     path: "/api/ai",
-    target: process.env.AI_SERVICE_URL || "http://localhost:8000",
+    target: process.env.AI_SERVICE_URL || "http://localhost:3004",
     auth: true,
   },
   {
@@ -136,6 +136,12 @@ app.listen(PORT, () => {
   console.log(`📊 Environment: ${process.env.NODE_ENV || "development"}`);
   console.log(`🔐 Authentication: Enabled`);
   console.log(`⚡ Rate limiting: Active`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received. Shutting down gracefully');
+  process.exit(0);
 });
 
 export default app;

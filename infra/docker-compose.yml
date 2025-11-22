@@ -1,0 +1,162 @@
+version: '3.8'
+
+services:
+  # API Gateway
+  api-gateway:
+    build: ../services/api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - USER_SERVICE_URL=http://user-service:3002
+      - TRACKING_SERVICE_URL=http://tracking-service:3003
+      - AI_SERVICE_URL=http://ai-service:3004
+      - REWARD_SERVICE_URL=http://reward-service:3005
+      - PARTNERSHIP_SERVICE_URL=http://partnership-service:3006
+      - LEARNING_SERVICE_URL=http://learning-service:3007
+      - POLICY_SERVICE_URL=http://policy-service:3008
+    depends_on:
+      - auth-service
+      - user-service
+      - tracking-service
+      - ai-service
+      - reward-service
+      - partnership-service
+      - learning-service
+      - policy-service
+    networks:
+      - app-network
+
+  # Auth Service
+  auth-service:
+    build: ../services/auth-service
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - MONGODB_URI=mongodb://mongo:27017/auth-db
+      - JWT_SECRET=dev_secret_key_123
+      - SUPABASE_URL=https://tgzhfmebagygqjvzzcys.supabase.co
+      - SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRnemhmbWViYWd5Z3Fqdnp6Y3lzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzNzQ5MzAsImV4cCI6MjA3ODk1MDkzMH0.KtpKnCVxVhQoofvD5OgI3nTBBm6Kzwyt-ycLaTYsWTQ
+    depends_on:
+      - mongo
+    networks:
+      - app-network
+
+  # User Service
+  user-service:
+    build: ../services/user-service
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - MONGODB_URI=mongodb://mongo:27017/user-db
+    depends_on:
+      - mongo
+    networks:
+      - app-network
+
+  # Tracking Service
+  tracking-service:
+    build: ../services/tracking-service
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+      - MONGODB_URI=mongodb://mongo:27017/tracking-db
+      - USER_SERVICE_URL=http://user-service:3002
+    depends_on:
+      - mongo
+    networks:
+      - app-network
+
+  # AI Service (Python)
+  ai-service:
+    build: ../services/ai-service
+    ports:
+      - "3004:3004"
+    environment:
+      - PORT=3004
+      - MONGODB_URI=mongodb://mongo:27017/ai-db
+    depends_on:
+      - mongo
+    networks:
+      - app-network
+
+  # Reward Service
+  reward-service:
+    build: ../services/reward-service
+    ports:
+      - "3005:3005"
+    environment:
+      - PORT=3005
+      - MONGODB_URI=mongodb://mongo:27017/reward-db
+    depends_on:
+      - mongo
+    networks:
+      - app-network
+
+  # Partnership Service
+  partnership-service:
+    build: ../services/partnership-service
+    ports:
+      - "3006:3006"
+    environment:
+      - PORT=3006
+      - MONGODB_URI=mongodb://mongo:27017/partnership-db
+    depends_on:
+      - mongo
+    networks:
+      - app-network
+
+  # Learning Service
+  learning-service:
+    build: ../services/learning-service
+    ports:
+      - "3007:3007"
+    environment:
+      - PORT=3007
+      - MONGODB_URI=mongodb://mongo:27017/learning-db
+    depends_on:
+      - mongo
+    networks:
+      - app-network
+
+  # Policy Service
+  policy-service:
+    build: ../services/policy-service
+    ports:
+      - "3008:3008"
+    environment:
+      - PORT=3008
+      - MONGODB_URI=mongodb://mongo:27017/policy-db
+    depends_on:
+      - mongo
+    networks:
+      - app-network
+
+  # Database
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - app-network
+
+  # Redis (for API Gateway caching)
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo-data:

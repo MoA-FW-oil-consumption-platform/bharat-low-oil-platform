@@ -380,6 +380,89 @@ export const getDistrictAggregation = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Get Mid-Day Meal (MDM) Audit Report
+ */
+export const getMdmAudit = async (req: Request, res: Response) => {
+  try {
+    const { institutionId } = req.params;
+    const { month } = req.query;
+
+    if (!month || !/^\d{4}-\d{2}$/.test(month as string)) {
+      return res.status(400).json({ error: 'Valid month required (YYYY-MM format)' });
+    }
+
+    // Fetch institution
+    let institution;
+    try {
+      const response = await axios.get(`${USER_SERVICE_URL}/api/institutions/${institutionId}`);
+      institution = response.data;
+    } catch (err) {
+      return res.status(404).json({ error: 'Institution not found' });
+    }
+
+    if (institution.type !== 'school' && institution.type !== 'mdm_scheme') {
+      return res.status(400).json({ error: 'This report is only for Schools or MDM Schemes' });
+    }
+
+    // Calculate date range
+    const [year, monthNum] = (month as string).split('-').map(Number);
+    const startDate = new Date(year, monthNum - 1, 1);
+    const endDate = new Date(year, monthNum, 0);
+
+    // Fetch logs
+    const logs = await InstitutionalLog.find({
+      institutionId,
+      date: { $gte: startDate, $lte: endDate }
+    });
+
+    const totalMeals = logs.reduce((sum, log) => sum + log.mealsServed, 0);
+    const totalOil = logs.reduce((sum, log) => sum + log.oilUsed, 0);
+    const avgOilPerMeal = totalMeals > 0 ? totalOil / totalMeals : 0;
+    
+    // MDM Specific Limits (e.g., 15ml per child per day)
+    const MDM_LIMIT = 15; 
+    const isCompliant = avgOilPerMeal <= MDM_LIMIT;
+
+    // Calculate calorie estimation (approx 9kcal per gram of oil)
+    // Assuming density of oil is approx 0.92 g/ml
+    const oilCalories = totalOil * 0.92 * 9;
+    const avgOilCaloriesPerMeal = totalMeals > 0 ? oilCalories / totalMeals : 0;
+
+    return res.json({
+      auditId: `MDM-${institutionId}-${month}`,
+      institutionName: institution.name,
+      district: institution.district,
+      state: institution.state,
+      period: month as string,
+      auditSummary: {
+        totalMealsServed: totalMeals,
+        totalOilConsumedLiters: Number((totalOil / 1000).toFixed(2)),
+        avgOilPerStudent: Number(avgOilPerMeal.toFixed(2)),
+        mdmLimit: MDM_LIMIT,
+        complianceStatus: isCompliant ? 'PASS' : 'FAIL',
+        nutritionalImpact: {
+          avgCaloriesFromOil: Number(avgOilCaloriesPerMeal.toFixed(2)),
+          recommendation: isCompliant 
+            ? 'Oil usage is within healthy limits.' 
+            : 'Oil usage exceeds recommended limits for children. Immediate reduction required.'
+        }
+      },
+      dailyLogs: logs.map(log => ({
+        date: log.date,
+        meals: log.mealsServed,
+        oil: log.oilUsed,
+        perStudent: Number((log.oilUsed / log.mealsServed).toFixed(2)),
+        status: (log.oilUsed / log.mealsServed) <= MDM_LIMIT ? 'OK' : 'HIGH'
+      }))
+    });
+
+  } catch (error: any) {
+    console.error('MDM Audit error:', error);
+    return res.status(500).json({ error: error.message || 'Failed to generate MDM audit' });
+  }
+};
+
 // Helper function to get compliance report data
 async function getComplianceReportData(institutionId: string, month: string) {
   const response = await axios.get(`${USER_SERVICE_URL}/api/institutions/${institutionId}`);

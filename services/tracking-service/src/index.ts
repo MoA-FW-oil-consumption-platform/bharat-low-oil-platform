@@ -42,4 +42,10 @@ app.listen(PORT, () => {
   console.log(`📊 Tracking Service running on port ${PORT}`);
 });
 
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received. Shutting down gracefully');
+  process.exit(0);
+});
+
 export default app;

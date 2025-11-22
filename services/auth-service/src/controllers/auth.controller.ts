@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { supabase } from "../config/supabase";
 import jwt from "jsonwebtoken";
-import { StringValue } from "ms";
 import Joi from "joi";
 
 const registerSchema = Joi.object({
@@ -68,7 +67,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       };
 
       const token = jwt.sign(payload, process.env.JWT_SECRET as jwt.Secret, {
-        expiresIn: String(process.env.JWT_EXPIRES_IN || "7d") as StringValue,
+        expiresIn: String(process.env.JWT_EXPIRES_IN || "7d"),
       });
 
       res.status(201).json({
@@ -119,7 +118,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET as jwt.Secret, {
-      expiresIn: String(process.env.JWT_EXPIRES_IN || "7d") as StringValue,
+      expiresIn: String(process.env.JWT_EXPIRES_IN || "7d"),
     });
 
     res.json({
@@ -179,7 +178,7 @@ export const refreshToken = async (
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET as jwt.Secret, {
-      expiresIn: String(process.env.JWT_EXPIRES_IN || "7d") as StringValue,
+      expiresIn: String(process.env.JWT_EXPIRES_IN || "7d"),
     });
 
     res.json({
@@ -298,7 +297,7 @@ export const handleOAuthCallback = async (
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET as jwt.Secret, {
-      expiresIn: String(process.env.JWT_EXPIRES_IN || "7d") as StringValue,
+      expiresIn: String(process.env.JWT_EXPIRES_IN || "7d"),
     });
 
     res.json({

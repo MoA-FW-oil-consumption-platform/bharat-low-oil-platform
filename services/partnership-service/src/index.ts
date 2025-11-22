@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 
 import deliveryRoutes from './routes/delivery.routes';
 import partnerRoutes from './routes/partner.routes';
+import certificationRoutes from './routes/certification.routes';
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.get('/health', (req, res) => {
 // Routes
 app.use('/api/integrations', deliveryRoutes);
 app.use('/api/partner', partnerRoutes);
+app.use('/api/certifications', certificationRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -52,10 +54,20 @@ mongoose
   .connect(MONGODB_URI)
   .then(() => {
     console.log('✅ Connected to MongoDB');
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
       console.log(`🚀 Partnership Service running on port ${PORT}`);
       console.log(`📊 Delivery Integrations: http://localhost:${PORT}/api/integrations`);
       console.log(`🔗 Partner APIs: http://localhost:${PORT}/api/partner`);
+    });
+
+    // Graceful shutdown
+    process.on('SIGTERM', () => {
+      console.log('SIGTERM received. Shutting down gracefully');
+      server.close(() => {
+        mongoose.connection.close(false).then(() => {
+          process.exit(0);
+        });
+      });
     });
   })
   .catch((error) => {

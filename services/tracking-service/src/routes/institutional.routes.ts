@@ -3,7 +3,8 @@ import {
   bulkLogConsumption,
   getComplianceReport,
   generatePDFReport,
-  getDistrictAggregation
+  getDistrictAggregation,
+  getMdmAudit
 } from '../controllers/institutional.controller';
 
 const router = express.Router();
@@ -17,6 +18,9 @@ router.post('/:institutionId/bulk-log', bulkLogConsumption);
 
 // Get compliance report for month
 router.get('/:institutionId/compliance', getComplianceReport);
+
+// Get MDM Audit Report
+router.get('/:institutionId/mdm-audit', getMdmAudit);
 
 // Generate PDF compliance report
 router.get('/:institutionId/compliance/pdf', generatePDFReport);

@@ -1,0 +1,105 @@
+version: '3.8'
+
+services:
+  # API Gateway
+  api-gateway:
+    build:
+      context: ../services/api-gateway
+      target: builder
+    volumes:
+      - ../services/api-gateway:/app
+      - /app/node_modules
+    command: npm run dev
+    environment:
+      - NODE_ENV=development
+
+  # Auth Service
+  auth-service:
+    build:
+      context: ../services/auth-service
+      target: builder
+    volumes:
+      - ../services/auth-service:/app
+      - /app/node_modules
+    command: npm run dev
+    environment:
+      - NODE_ENV=development
+
+  # User Service
+  user-service:
+    build:
+      context: ../services/user-service
+      target: builder
+    volumes:
+      - ../services/user-service:/app
+      - /app/node_modules
+    command: npm run dev
+    environment:
+      - NODE_ENV=development
+
+  # Tracking Service
+  tracking-service:
+    build:
+      context: ../services/tracking-service
+      target: builder
+    volumes:
+      - ../services/tracking-service:/app
+      - /app/node_modules
+    command: npm run dev
+    environment:
+      - NODE_ENV=development
+
+  # AI Service
+  ai-service:
+    volumes:
+      - ../services/ai-service:/app
+    environment:
+      - ENVIRONMENT=development
+
+  # Reward Service
+  reward-service:
+    build:
+      context: ../services/reward-service
+      target: builder
+    volumes:
+      - ../services/reward-service:/app
+      - /app/node_modules
+    command: npm run dev
+    environment:
+      - NODE_ENV=development
+
+  # Partnership Service
+  partnership-service:
+    build:
+      context: ../services/partnership-service
+      target: builder
+    volumes:
+      - ../services/partnership-service:/app
+      - /app/node_modules
+    command: npm run dev
+    environment:
+      - NODE_ENV=development
+
+  # Learning Service
+  learning-service:
+    build:
+      context: ../services/learning-service
+      target: builder
+    volumes:
+      - ../services/learning-service:/app
+      - /app/node_modules
+    command: npm run dev
+    environment:
+      - NODE_ENV=development
+
+  # Policy Service
+  policy-service:
+    build:
+      context: ../services/policy-service
+      target: builder
+    volumes:
+      - ../services/policy-service:/app
+      - /app/node_modules
+    command: npm run dev
+    environment:
+      - NODE_ENV=development

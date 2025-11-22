@@ -1,0 +1,21 @@
+{
+  "name": "@bharat-low-oil/backend-common",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w"
+  },
+  "dependencies": {
+    "mongoose": "^8.0.3",
+    "jsonwebtoken": "^9.0.2",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/node": "^20.10.6"
+  }
+}

@@ -39,7 +39,7 @@ RUN npm install --only=production && \
 COPY --from=builder /app/dist ./dist
 
 # Expose the service port
-EXPOSE 3003
+EXPOSE 3008
 
 # Create and switch to non-root user for security
 RUN chown -R node:node /app

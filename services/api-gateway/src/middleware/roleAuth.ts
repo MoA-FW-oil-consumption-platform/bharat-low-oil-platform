@@ -1,17 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: {
-        userId: string;
-        email: string;
-        role?: 'consumer' | 'restaurant_owner' | 'institutional_manager' | 'admin';
-      };
-    }
-  }
-}
-
 /**
  * Middleware to check if user has required role
  */
