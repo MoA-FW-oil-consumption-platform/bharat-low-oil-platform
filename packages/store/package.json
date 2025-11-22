@@ -1,0 +1,22 @@
+{
+  "name": "@bharat-low-oil/store",
+  "version": "1.0.0",
+  "description": "Shared Zustand stores",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zustand": "^4.5.0",
+    "@bharat-low-oil/shared-types": "*",
+    "@bharat-low-oil/api-client": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

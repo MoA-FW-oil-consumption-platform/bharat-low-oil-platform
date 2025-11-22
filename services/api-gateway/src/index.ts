@@ -17,7 +17,13 @@ const PORT = process.env.API_GATEWAY_PORT || 3000;
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(",") || "*",
+    origin: process.env.ALLOWED_ORIGINS?.split(",") || [
+      "http://localhost:3300",  // Web App
+      "http://localhost:19006", // Mobile App (Expo)
+      "http://localhost:3100",  // Admin Dashboard
+      "http://localhost:3200",  // Restaurant Portal
+      "http://localhost:8081",  // Mobile App (alternative port)
+    ],
     credentials: true,
   })
 );
@@ -52,7 +58,7 @@ const services = [
   },
   {
     path: "/api/ai",
-    target: process.env.AI_SERVICE_URL || "http://localhost:3004",
+    target: process.env.AI_SERVICE_URL || "http://localhost:8000",
     auth: true,
   },
   {
@@ -63,6 +69,26 @@ const services = [
   {
     path: "/api/partnerships",
     target: process.env.PARTNERSHIP_SERVICE_URL || "http://localhost:3006",
+    auth: true,
+  },
+  {
+    path: "/api/learning",
+    target: process.env.LEARNING_SERVICE_URL || "http://localhost:3007",
+    auth: true,
+  },
+  {
+    path: "/api/policy",
+    target: process.env.POLICY_SERVICE_URL || "http://localhost:3008",
+    auth: true,
+  },
+  {
+    path: "/api/institutions",
+    target: process.env.USER_SERVICE_URL || "http://localhost:3002",
+    auth: true,
+  },
+  {
+    path: "/api/institutional",
+    target: process.env.TRACKING_SERVICE_URL || "http://localhost:3003",
     auth: true,
   },
 ];

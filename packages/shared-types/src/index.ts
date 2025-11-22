@@ -1,18 +1,48 @@
 // User Types
 export interface User {
   id: string;
+  userId?: string; // Alias for id, used in some parts of the app
   email: string;
   phone?: string;
-  name: string;
+  name?: string;
+  role?: 'consumer' | 'restaurant_owner' | 'institutional_manager' | 'admin';
   age?: number;
   gender?: 'male' | 'female' | 'other';
   familySize?: number;
   dietaryPreferences?: string[];
   healthGoals?: string[];
-  preferredLanguage: 'en' | 'hi' | 'ta' | 'bn' | 'te';
+  preferredLanguage?: Language;
+  avatar?: string;
+  city?: string;
+  state?: string;
   location?: Location;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+}
+
+export type Theme = 'light' | 'dark' | 'auto';
+export type Language = 'en' | 'hi' | 'ta' | 'bn' | 'te';
+
+export interface SettingsState {
+  theme: Theme;
+  language: Language;
+  notificationsEnabled: boolean;
+  emailNotificationsEnabled: boolean;
+  dailyRemindersEnabled: boolean;
+  weeklyReportsEnabled: boolean;
+}
+
+export interface RegisterData {
+  email: string;
+  password: string;
+  name: string;
+  role?: 'consumer' | 'restaurant_owner';
+}
+
+export interface AuthResponse {
+  token: string;
+  refreshToken?: string;
+  user: User;
 }
 
 export interface Location {

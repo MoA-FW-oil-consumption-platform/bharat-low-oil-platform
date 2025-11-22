@@ -1,0 +1,22 @@
+{
+  "name": "@bharat-low-oil/api-client",
+  "version": "1.0.0",
+  "description": "Shared API client and endpoints",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "@bharat-low-oil/shared-types": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^20.0.0"
+  }
+}
