@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import { connectDB } from './config/database';
 import userRoutes from './routes/user.routes';
 import institutionRoutes from './routes/institution.routes';
+import communityRoutes from './routes/community.routes';
 import { errorHandler } from './middleware/errorHandler';
 
 dotenv.config();
@@ -28,6 +29,7 @@ app.get('/health', (_req, res) => {
 
 app.use('/users', userRoutes);
 app.use('/api/institutions', institutionRoutes);
+app.use('/community', communityRoutes);
 
 // Error handling
 app.use(errorHandler);

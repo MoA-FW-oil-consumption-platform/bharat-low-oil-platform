@@ -6,7 +6,8 @@
   "workspaces": [
     "apps/*",
     "services/*",
-    "packages/*"
+    "packages/*",
+    "iot/*"
   ],
   "scripts": {
     "dev": "turbo run dev --parallel",

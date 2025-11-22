@@ -5,7 +5,8 @@ import {
   uploadMenu,
   checkCertification,
   subscribeWebhook,
-  getPartnerStats
+  getPartnerStats,
+  searchPartners
 } from '../controllers/partner.controller';
 import { authenticateJWT, checkPermission } from '../middleware/auth.middleware';
 import { partnerRateLimit, authRateLimit } from '../middleware/rateLimiter.middleware';
@@ -18,6 +19,9 @@ const router = express.Router();
 
 // Public registration endpoint
 router.post('/register', partnerRateLimit, registerPartner);
+
+// Public search endpoint
+router.get('/search', partnerRateLimit, searchPartners);
 
 // Authentication endpoint (API key → JWT)
 router.post('/auth/token', authRateLimit, authenticatePartner);

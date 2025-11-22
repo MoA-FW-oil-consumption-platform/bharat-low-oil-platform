@@ -28,8 +28,8 @@ app.use(
   })
 );
 app.use(morgan("combined"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.json()); // Removed to allow proxying of body
+// app.use(express.urlencoded({ extended: true })); // Removed to allow proxying of body
 
 // Rate limiting
 app.use(rateLimiter);
@@ -102,7 +102,7 @@ services.forEach((service) => {
           target: service.target,
           changeOrigin: true,
           pathRewrite: {
-            [`^${service.path}`]: "",
+            [`^${service.path}`]: service.path.replace('/api', ''),
           },
           onError: (err, _req, res) => {
             console.error(`Proxy error for ${service.path}:`, err);
@@ -115,7 +115,7 @@ services.forEach((service) => {
           target: service.target,
           changeOrigin: true,
           pathRewrite: {
-            [`^${service.path}`]: "",
+            [`^${service.path}`]: service.path.replace('/api', ''),
           },
         }),
       ];

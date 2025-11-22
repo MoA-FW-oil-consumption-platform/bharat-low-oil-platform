@@ -299,3 +299,43 @@ export const getPartnerStats = async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message || 'Failed to get stats' });
   }
 };
+
+/**
+ * Search for partners (Public)
+ */
+export const searchPartners = async (req: Request, res: Response) => {
+  try {
+    const { query, lat, lng, radius } = req.query;
+
+    // Basic text search on restaurant name
+    const searchCriteria: any = { isActive: true };
+    
+    if (query) {
+      searchCriteria.restaurantName = { $regex: query, $options: 'i' };
+    }
+
+    // In a real app, we would use geospatial queries here if lat/lng provided
+    // For now, just return matching names
+    
+    const partners = await PartnerAuth.find(searchCriteria)
+      .select('restaurantId restaurantName permissions createdAt')
+      .limit(20);
+
+    // Mock adding "Low Oil Certified" badge status (since we don't have a separate profile model yet)
+    // In production, join with Certification collection
+    const results = partners.map(p => ({
+      ...p.toObject(),
+      isCertified: true, // Mocked for demo
+      certificationLevel: 'Gold',
+      address: '123 Healthy St, Food City' // Mocked
+    }));
+
+    res.json({
+      results,
+      count: results.length
+    });
+  } catch (error: any) {
+    console.error('Search partners error:', error);
+    res.status(500).json({ error: error.message || 'Failed to search partners' });
+  }
+};

@@ -66,8 +66,23 @@ services:
       - PORT=3003
       - MONGODB_URI=mongodb://mongo:27017/tracking-db
       - USER_SERVICE_URL=http://user-service:3002
+      - ENABLE_IOT=true
+      - MQTT_BROKER_URL=mqtt://mqtt-broker:1883
     depends_on:
       - mongo
+      - mqtt-broker
+    networks:
+      - app-network
+
+  # MQTT Broker (Mosquitto)
+  mqtt-broker:
+    image: eclipse-mosquitto:latest
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - mosquitto-data:/mosquitto/data
+      - mosquitto-log:/mosquitto/log
     networks:
       - app-network
 
@@ -160,3 +175,5 @@ networks:
 
 volumes:
   mongo-data:
+  mosquitto-data:
+  mosquitto-log:

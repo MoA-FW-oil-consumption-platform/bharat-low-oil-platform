@@ -1,3 +1,97 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light Theme */
+    --background: 210 33% 98%; /* #F7F9FC */
+    --foreground: 0 0% 10%;    /* #1A1A1A */
+
+    --card: 0 0% 100%;         /* #FFFFFF */
+    --card-foreground: 0 0% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+
+    --primary: 217 86% 29%;    /* #0A3B8A */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 33% 98%;
+    --secondary-foreground: 0 0% 10%;
+
+    --muted: 210 33% 98%;
+    --muted-foreground: 0 0% 31%; /* #505050 */
+
+    --accent: 33 100% 50%;     /* #FF8C00 */
+    --accent-foreground: 0 0% 10%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 218 27% 90%;     /* #DDE3EC */
+    --input: 218 27% 90%;
+    --ring: 217 86% 29%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Dark Theme */
+    --background: 218 22% 7%;  /* #0E1116 */
+    --foreground: 216 20% 96%; /* #F2F4F7 */
+
+    --card: 213 17% 12%;       /* #1A1F25 */
+    --card-foreground: 216 20% 96%;
+
+    --popover: 213 17% 12%;
+    --popover-foreground: 216 20% 96%;
+
+    --primary: 218 73% 44%;    /* #1E5CC4 */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 213 17% 12%;
+    --secondary-foreground: 216 20% 96%;
+
+    --muted: 213 17% 12%;
+    --muted-foreground: 220 9% 73%; /* #B3B8C2 */
+
+    --accent: 34 100% 60%;     /* #FFA733 */
+    --accent-foreground: 0 0% 10%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 213 11% 19%;     /* #2A2F35 */
+    --input: 213 11% 19%;
+    --ring: 218 73% 44%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in-up {
+    animation: fadeInUp 0.8s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  
+  .delay-100 { animation-delay: 100ms; }
+  .delay-200 { animation-delay: 200ms; }
+  .delay-300 { animation-delay: 300ms; }
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

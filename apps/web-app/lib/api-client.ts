@@ -1,17 +1,28 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+import { useAuthStore } from '@/store/useAuthStore';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
 interface RequestOptions extends RequestInit {
   token?: string;
 }
 
+const getAuthHeader = (token?: string) => {
+  const storeToken = useAuthStore.getState().token;
+  const finalToken = token || storeToken;
+  return finalToken ? { Authorization: `Bearer ${finalToken}` } : {};
+};
+
 export const apiClient = {
   async get<T>(endpoint: string, options?: RequestOptions): Promise<T> {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...getAuthHeader(options?.token),
+      ...options?.headers,
+    };
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(options?.token && { Authorization: `Bearer ${options.token}` }),
-      },
+      headers,
       ...options,
     });
 
@@ -23,13 +34,20 @@ export const apiClient = {
   },
 
   async post<T>(endpoint: string, data?: any, options?: RequestOptions): Promise<T> {
+    const isFormData = data instanceof FormData;
+    const headers: HeadersInit = {
+      ...getAuthHeader(options?.token),
+      ...options?.headers,
+    };
+
+    if (!isFormData) {
+      (headers as any)['Content-Type'] = 'application/json';
+    }
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(options?.token && { Authorization: `Bearer ${options.token}` }),
-      },
-      body: data ? JSON.stringify(data) : undefined,
+      headers,
+      body: isFormData ? data : (data ? JSON.stringify(data) : undefined),
       ...options,
     });
 
@@ -41,13 +59,20 @@ export const apiClient = {
   },
 
   async put<T>(endpoint: string, data?: any, options?: RequestOptions): Promise<T> {
+    const isFormData = data instanceof FormData;
+    const headers: HeadersInit = {
+      ...getAuthHeader(options?.token),
+      ...options?.headers,
+    };
+
+    if (!isFormData) {
+      (headers as any)['Content-Type'] = 'application/json';
+    }
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(options?.token && { Authorization: `Bearer ${options.token}` }),
-      },
-      body: data ? JSON.stringify(data) : undefined,
+      headers,
+      body: isFormData ? data : (data ? JSON.stringify(data) : undefined),
       ...options,
     });
 
@@ -59,12 +84,15 @@ export const apiClient = {
   },
 
   async delete<T>(endpoint: string, options?: RequestOptions): Promise<T> {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...getAuthHeader(options?.token),
+      ...options?.headers,
+    };
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(options?.token && { Authorization: `Bearer ${options.token}` }),
-      },
+      headers,
       ...options,
     });
 
@@ -75,3 +103,4 @@ export const apiClient = {
     return response.json();
   },
 };
+

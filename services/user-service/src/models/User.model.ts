@@ -11,6 +11,8 @@ export interface IUser extends Document {
   dietaryHabit?: 'vegetarian' | 'non-vegetarian';
   healthConditions?: string[];
   monthlyOilConsumption?: number;
+  streak?: number;
+  points?: number;
   preferences: {
     language: string;
     notifications: boolean;
@@ -31,6 +33,8 @@ const UserSchema = new Schema<IUser>(
     dietaryHabit: { type: String, enum: ['vegetarian', 'non-vegetarian'] },
     healthConditions: [{ type: String }],
     monthlyOilConsumption: { type: Number },
+    streak: { type: Number, default: 0 },
+    points: { type: Number, default: 0 },
     preferences: {
       language: { type: String, default: 'en' },
       notifications: { type: Boolean, default: true }

@@ -1,0 +1,9 @@
+{
+  "name": "ai-service",
+  "version": "1.0.0",
+  "description": "AI Service for Bharat Low Oil Platform",
+  "scripts": {
+    "dev": "../../.venv/bin/python main.py",
+    "start": "../../.venv/bin/python main.py"
+  }
+}

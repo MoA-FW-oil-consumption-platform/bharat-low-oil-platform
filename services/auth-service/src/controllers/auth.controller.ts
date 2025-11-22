@@ -66,9 +66,12 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         platform,
       };
 
-      const token = jwt.sign(payload, process.env.JWT_SECRET as jwt.Secret, {
-        expiresIn: String(process.env.JWT_EXPIRES_IN || "7d"),
-      });
+      const secret = process.env.JWT_SECRET || "default-secret";
+      const options: jwt.SignOptions = {
+        expiresIn: (process.env.JWT_EXPIRES_IN || "7d") as any,
+      };
+
+      const token = jwt.sign(payload, secret, options);
 
       res.status(201).json({
         message: "Registration successful",
@@ -117,9 +120,12 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       platform,
     };
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET as jwt.Secret, {
-      expiresIn: String(process.env.JWT_EXPIRES_IN || "7d"),
-    });
+    const secret = process.env.JWT_SECRET || "default-secret";
+    const options: jwt.SignOptions = {
+      expiresIn: (process.env.JWT_EXPIRES_IN || "7d") as any,
+    };
+
+    const token = jwt.sign(payload, secret, options);
 
     res.json({
       message: "Login successful",
@@ -177,9 +183,12 @@ export const refreshToken = async (
       platform,
     };
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET as jwt.Secret, {
-      expiresIn: String(process.env.JWT_EXPIRES_IN || "7d"),
-    });
+    const secret = process.env.JWT_SECRET || "default-secret";
+    const options: jwt.SignOptions = {
+      expiresIn: (process.env.JWT_EXPIRES_IN || "7d") as any,
+    };
+
+    const token = jwt.sign(payload, secret, options);
 
     res.json({
       session: data.session,
@@ -296,9 +305,12 @@ export const handleOAuthCallback = async (
       platform,
     };
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET as jwt.Secret, {
-      expiresIn: String(process.env.JWT_EXPIRES_IN || "7d"),
-    });
+    const secret = process.env.JWT_SECRET || "default-secret";
+    const options: jwt.SignOptions = {
+      expiresIn: (process.env.JWT_EXPIRES_IN || "7d") as any,
+    };
+
+    const token = jwt.sign(payload, secret, options);
 
     res.json({
       message: "OAuth login successful",
